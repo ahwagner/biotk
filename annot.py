@@ -3,7 +3,7 @@ __author__ = 'Alex H Wagner'
 import sqlite3
 import csv
 import pathlib
-
+import warnings
 
 class Gene:
 
@@ -46,7 +46,7 @@ class Gene:
         item = item.lower()
         if item in Gene.annotation_types:
             if not self.is_defined(item):
-                raise KeyError("This should have been defined.")
+                return ''
             return self.annotations[item]
         else:
             raise TypeError(Gene._type_error_string)
@@ -58,9 +58,14 @@ class Gene:
         self._c.execute(sql)
         r = self._c.fetchall()
         if len(r) == 0:
-            raise ValueError('Gene not found in db!')
+            pass    # Do nothing if not found in table.
         elif len(r) > 1:
-            raise ValueError('Gene identifier not unique!')
+            for row in r:
+                for i, v in enumerate(row):
+                    try:
+                        self.annotations[Gene.annotation_types[i]].append(v)
+                    except (AttributeError, KeyError):
+                        self.annotations[Gene.annotation_types[i]] = [v]
         else:
             self.annotations = dict(zip(Gene.annotation_types, r[0]))
 
