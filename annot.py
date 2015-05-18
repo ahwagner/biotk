@@ -3,7 +3,6 @@ __author__ = 'Alex H Wagner'
 import sqlite3
 import csv
 import pathlib
-import warnings
 
 class Gene:
 
