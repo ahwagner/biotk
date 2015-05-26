@@ -9,20 +9,29 @@ import sys
 
 class RNASeq:
 
-    def __init__(self, fpkm_df=None, trx_gtf=None, range_dict=None):
+    def __init__(self, fpkm_df=None, fpkm_tracking_file=None, trx_gtf=None, range_dict=None):
         self.gtf_model = None
-        if trx_gtf:
-            self.gtf_model = self.gtf_reader(trx_gtf)
-        elif range_dict:
+        if range_dict:
             self.gtf_model = range_dict
+        elif trx_gtf:
+            self.gtf_model = self.gtf_reader(trx_gtf)
         if fpkm_df is not None:
             self.df = fpkm_df
             header = list(self.df)
             if header != ['id', 'FPKM']:
                 raise ValueError('Expected dataframe header in form ["id", "FPKM"]. Got {0}'
-                                 .format(header))
-            #calculate pseudo-counts, TPMs
+                                 .format(', '.join(header)))
+        elif fpkm_tracking_file is not None:
+            df = pandas.read_csv(fpkm_tracking_file, sep="\t")
+            df = df[['tracking_id', 'FPKM']]
+            df.columns = ['id', 'FPKM']
+            df.set_index('id')
+            self.df = df
+        else:
+            raise AttributeError('No fpkm dataframe or tracking file provided.')
+        #calculate pseudo-counts, TPMs
 
+    @staticmethod
     def gtf_reader(gtf):
         d = dict()
         for i, line in enumerate(gtf):
