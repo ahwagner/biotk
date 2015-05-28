@@ -7,10 +7,10 @@ class Range:
 
     def __init__(self, sub_ranges=(), scaffold=None):
         sub_ranges = list(sub_ranges)
-        if len(sub_ranges) == 2 and isinstance(sub_ranges[0], int) and isinstance(sub_ranges[1], int):
+        if self._is_start_end(sub_ranges):
             sub_ranges = [sub_ranges]
         for i, r in enumerate(sub_ranges):
-            if len(r) != 2 or not isinstance(r[0], int) or not isinstance(r[1], int):
+            if not self._is_start_end(r):
                 raise ValueError('Ranges should be a list of (start <int>, end <int>) iterables.\n'
                                  'Instead got {0}.'.format(sub_ranges))
             sub_ranges[i] = list(r)
@@ -21,6 +21,10 @@ class Range:
 
     def sort(self):
         self.sub_ranges = sorted(self.sub_ranges, key=o.itemgetter(0, 1))
+
+    @staticmethod
+    def _is_start_end(test_list):
+        return len(test_list) == 2 and isinstance(test_list[0], int) and isinstance(test_list[1], int)
 
     def __add__(self, other):
         if isinstance(other, Range):
@@ -33,7 +37,7 @@ class Range:
                 r.scaffold = self.scaffold
             else:
                 raise ValueError('Scaffolds do not match.')
-        elif len(other) == 2 and isinstance(other[0], int) and isinstance(other[1], int):
+        elif self._is_start_end(other):
             o = Range(other, self.scaffold)
             r = self + o
         else:
