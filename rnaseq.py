@@ -9,7 +9,7 @@ import sys
 
 class RNASeq:
 
-    def __init__(self, fpkm_df=None, fpkm_tracking_file=None, trx_gtf_file=None, range_dict=None, read_length=None,
+    def __init__(self, fpkm_df=None, fpkm_tracking_file=None, trx_gtf_file=None, range_dict=None,
                  aligned_fragment_count=None, counts_df=None):
         self.gtf_model = None
         if range_dict:
@@ -34,10 +34,6 @@ class RNASeq:
             self.df = df
         else:
             raise AttributeError('No fpkm dataframe or tracking file provided.')
-        if read_length:
-            self.rl = read_length
-        else:
-            raise AttributeError('No average read length provided.')
         if aligned_fragment_count is None:
             aligned_fragment_count = 1000000
 
